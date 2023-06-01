@@ -1,0 +1,4 @@
+Flask
+wakeonlan
+flask_sqlalchemy
+ping3

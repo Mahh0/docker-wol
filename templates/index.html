@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wake-On-LAN</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Wake-On-LAN</h1>
+
+    {% if session.logged_in %}
+        <div class="admin-panel">
+            <h2>Admin Panel</h2>
+            <form action="{{ url_for('add_host') }}" method="post">
+                <label for="nom">NOM:</label>
+                <input type="text" id="nom" name="nom" required>
+                <label for="ip">IP:</label>
+                <input type="text" id="ip" name="ip" required>
+                <label for="mac">MAC:</label>
+                <input type="text" id="mac" name="mac" required>
+                <input type="submit" value="Add Host">
+            </form>
+            <form action="{{ url_for('logout') }}" method="post">
+                <input type="submit" value="Logout">
+            </form>
+        </div>
+    {% else %}
+        <div class="login-panel">
+            <h2>Login</h2>
+            <form action="{{ url_for('login') }}" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <input type="submit" value="Login">
+            </form>
+        </div>
+    {% endif %}
+
+    <table>
+        <tr>
+            <th>Nom</th>
+            <th>IP</th>
+            <th>MAC</th>
+            <th>Status</th>
+            <th>Wake-On-LAN</th>
+            {% if session.logged_in %}
+                <th>Actions</th>
+            {% endif %}
+        </tr>
+        {% for host in hosts %}
+            <tr>
+                <td>{{ host.nom }}</td>
+                <td>{{ host.ip }}</td>
+                <td>{{ host.mac }}</td>
+                <td class="{{ check_host_status(host.ip)|status_class }}">
+                    {% if check_host_status(host.ip) %} ONLINE {% else %} OFFLINE {% endif %}
+                </td>
+                <td>
+                    {% if not check_host_status(host.ip) %}
+                        <a class="wol-button" href="{{ url_for('wake_on_lan', ip=host.ip) }}">Wake-On-LAN</a>
+                    {% endif %}
+                </td>
+                {% if session.logged_in %}
+                    <td>
+                        <form action="{{ url_for('delete_host', host_id=host.id) }}" method="post">
+                            <input type="submit" value="Delete">
+                        </form>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
