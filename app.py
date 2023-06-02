@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from ping3 import ping
 import subprocess
+from wakeonlan import send_magic_packet
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hosts.db'
@@ -61,9 +62,24 @@ def delete_host(host_id):
 
 @app.route('/wol/<ip>')
 def wake_on_lan(ip):
-    mac = Host.query.filter_by(ip=ip).first().mac
-    subprocess.run(['wakeonlan', mac])
+    host = Host.query.filter_by(ip=ip).first()
+    if host:
+        mac = host.mac
+        send_magic_packet(mac)
     return redirect(url_for('index'))
+
+
+@app.route('/update/<int:host_id>', methods=['GET', 'POST'])
+def update_host(host_id):
+    host = Host.query.get_or_404(host_id)
+    if request.method == 'POST':
+        host.nom = request.form['nom']
+        host.ip = request.form['ip']
+        host.mac = request.form['mac']
+        db.session.commit()
+        return redirect(url_for('index'))
+    else:
+        return render_template('update.html', host=host)
 
 
 @app.route('/login', methods=['GET', 'POST'])

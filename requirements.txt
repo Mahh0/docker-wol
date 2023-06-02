@@ -2,3 +2,4 @@ Flask
 wakeonlan
 flask_sqlalchemy
 ping3
+paramiko

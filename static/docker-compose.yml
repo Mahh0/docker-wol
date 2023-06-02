@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  docker-wol:
+    image: dockerwol:latest
+    container_name: dockerwol_container
+    network_mode: "host"
+    restart: always

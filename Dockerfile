@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y net-tools && pip install --no-cache-dir
 
 # Exposer le port 80
 EXPOSE 80
-EXPOSE 5000
 
 # Commande à exécuter lors du démarrage du conteneur
 CMD ["python", "app.py"]

@@ -5,36 +5,33 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Wake-On-LAN</h1>
-
-    {% if session.logged_in %}
-        <div class="admin-panel">
-            <h2>Admin Panel</h2>
-            <form action="{{ url_for('add_host') }}" method="post">
-                <label for="nom">NOM:</label>
-                <input type="text" id="nom" name="nom" required>
-                <label for="ip">IP:</label>
-                <input type="text" id="ip" name="ip" required>
-                <label for="mac">MAC:</label>
-                <input type="text" id="mac" name="mac" required>
-                <input type="submit" value="Add Host">
-            </form>
-            <form action="{{ url_for('logout') }}" method="post">
-                <input type="submit" value="Logout">
-            </form>
+    <div class="top">
+        <div class="banner">
+            <h1 class="banner-title">Wake-On-LAN</h1>
+            <div class="login-form">
+                {% if session.logged_in %}
+                    <form class="logout-form" action="{{ url_for('logout') }}" method="post">
+                        <input class="logout-button" type="submit" value="Logout">
+                    </form>
+                {% else %}
+                    <form action="{{ url_for('login') }}" method="post">
+                        <input class="login-input" type="text" id="username" name="username" placeholder="Username" required>
+                        <input class="login-input" type="password" id="password" name="password" placeholder="Password" required>
+                        <input class="login-button" type="submit" value="Login">
+                    </form>
+                {% endif %}
+            </div>
         </div>
-    {% else %}
-        <div class="login-panel">
-            <h2>Login</h2>
-            <form action="{{ url_for('login') }}" method="post">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-                <input type="submit" value="Login">
-            </form>
-        </div>
-    {% endif %}
+    </div>
+    <div class="container">
+        <h1>Ajouter un hôte</h1>
+        <form action="{{ url_for('add_host') }}" method="post">
+            <input type="text" id="nom" name="nom" placeholder="Nom" required>
+            <input type="text" id="ip" name="ip" placeholder="IP" required>
+            <input type="text" id="mac" name="mac" placeholder="MAC" required>
+            <input type="submit" value="Ajouter">
+        </form>
+    </div>
 
     <table>
         <tr>
@@ -56,14 +53,20 @@
                     {% if check_host_status(host.ip) %} ONLINE {% else %} OFFLINE {% endif %}
                 </td>
                 <td>
-                    {% if not check_host_status(host.ip) %}
-                        <a class="wol-button" href="{{ url_for('wake_on_lan', ip=host.ip) }}">Wake-On-LAN</a>
+                    {% if check_host_status(host.ip) %}
+                        <form action="{{ url_for('wake_on_lan', ip=host.ip) }}" method="get">
+                            <input type="submit" value="Shutdown">
+                        </form>
+                    {% else %}
+                        <form action="{{ url_for('wake_on_lan', ip=host.ip) }}" method="get">
+                            <input type="submit" value="WOL">
+                        </form>
                     {% endif %}
                 </td>
                 {% if session.logged_in %}
                     <td>
-                        <form action="{{ url_for('delete_host', host_id=host.id) }}" method="post">
-                            <input type="submit" value="Delete">
+                        <form action="{{ url_for('update_host', host_id=host.id) }}" method="get">
+                            <input type="submit" value="Configuration">
                         </form>
                     </td>
                 {% endif %}
